@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Data Fetch</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            padding: 0;
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1f1c2c, #928DAB);
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            width: 450px;
+            border-radius: 12px;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            color: white;
+        }
+        .container h2 {
+            margin-bottom: 15px;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .container p {
+            font-size: 14px;
+            margin-bottom: 12px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        .input-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        input {
+            flex: 1;
+            height: 45px;
+            padding: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transition: border-color 0.3s;
+        }
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        input:focus {
+            border-color: #6A11CB;
+        }
+        .button {
+            background: linear-gradient(to right, #6A11CB, #2575FC);
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.3s;
+        }
+        .button:hover {
+            background: linear-gradient(to right, #2575FC, #6A11CB);
+            transform: scale(1.05);
+        }
+        #view {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            color: white;
+            white-space: pre-wrap;
+            text-align: left;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 20px;
+            position: relative;
+        }
+        #view::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #6A11CB;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        .loading #view::before {
+            display: block;
+        }
+        .loading #view {
+            color: transparent;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Fetch API Data</h2>
+        <p><b>Get Products Data:</b> Enter <code>/products</code></p>
+        <p><b>Get Carts Data:</b> Enter <code>/carts</code></p>
+        <div class="input-container">
+            <input id="f" type="text" placeholder="Enter your requirement">
+            <button class="button" onclick="fetchData()">Fetch</button>
+        </div>
+        <p id="view">Response will be displayed here</p>
+    </div>
+    <script>
+        async function fetchData() {
+            const inputField = document.getElementById("f");
+            const responseView = document.getElementById("view");
+            const container = document.querySelector(".container");
+            const inputValue = inputField.value.trim();
+
+            if (!inputValue || (inputValue !== "/products" && inputValue !== "/carts")) {
+                responseView.innerText = "⚠️ Please enter a valid option: /products or /carts";
+                return;
+            }
+
+            // Show loading state
+            container.classList.add("loading");
+
+            try {
+                let response = await fetch(`https://fetch-data-2.onrender.com${inputValue}`);
+                if (!response.ok) throw new Error("Failed to fetch data");
+
+                let data = await response.json();
+                responseView.innerText = JSON.stringify(data, null, 2);
+            } catch (error) {
+                responseView.innerText = "❌ Error fetching data. Please try again.";
+            } finally {
+                // Hide loading state
+                container.classList.remove("loading");
+            }
+        }
+    </script>
+</body>
+</html>
